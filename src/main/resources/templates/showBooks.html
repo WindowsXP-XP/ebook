@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Document</title>
+    <link rel="stylesheet" type="text/css" th:href="@{/css/main.css}">
+    <link rel="stylesheet" type="text/css" th:href="@{/css/layui.css}">
+    <script type="text/javascript" th:src="@{/layui.js}"></script>
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=0">
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge,chrome=1">
+    <style>
+        .spanBorder{border: 1px solid;font-size: 20px;padding: 5px 5px;}
+        .bookTitle{font-size: 30px;color: #a96fa7;margin-top: 5px}
+    </style>
+</head>
+<body>
+
+<div class="content content-nav-base information-content">
+    <div class="info-list-box">
+        <div class="info-list w1200">
+            <div class="item-box layui-clear" id="book_show">
+                <!-- 模板引擎填充内容 -->
+
+            </div>
+            <div id="demo0" style="text-align: center;"></div>
+        </div>
+    </div>
+</div>
+<!-- 模版引擎导入 -->
+<script type="text/html" id="demo">
+    {{# layui.each(d.data,function(index,item){}}
+    <div class="item" style="width: 100%">
+        <div class="img">
+            <img src={{"/"+item.bookImage}} alt="" style="width: 180px;height: 240px">
+        </div>
+        <div class="text">
+            <a class="bookTitle" id="{{item.bookId}}" onclick="toBookDetail(this.id)">{{item.bookName}}</a>
+            <p class="data" style="font-size: 25px;color: #a96fa7;margin-bottom: 10px;">{{item.bookAuthor}}</p>
+            <span style="font-size: 18px;color: #a96fa7;">简介：</span><p class="info-cont" style="font-size: 18px;width: 800px;">{{item.bookIntroduction}}</p>
+            <div style="margin:10px 0">
+                <span style="color: #e36d1b" class="spanBorder">{{item.bookCategory}}</span>&nbsp;<span style="color: #52c1e2" class="spanBorder">字数：{{item.bookTotalWord}}万</span>&nbsp;
+                <span style="color: #5adb98" class="spanBorder">阅读量：{{item.bookReadTime}}</span>&nbsp;<span style="color: #d862d4" class="spanBorder">收藏量：{{item.bookCollectionTime}}</span>
+            </div>
+        </div>
+    </div>
+    {{# })}}
+</script>
+<script>
+    layui.config({
+        base: 'js/' //你存放新模块的目录，注意，不是layui的模块目录
+    }).use(['mm', 'laypage'], function () {
+        var
+            mm = layui.mm,  laypage = layui.laypage;
+
+        // 模版引擎导入
+        var html = demo.innerHTML;
+        var listCont = document.getElementById('book_show');
+        mm.request({
+            url: '/book/initBooks',
+            success: function (res) {
+                console.log(res);
+                listCont.innerHTML = mm.renderHtml(html, res)
+                laypage.render({
+                    elem: 'demo0'
+                    , count: res.count //数据总数
+                    // ,
+                });
+            },
+            error: function (res) {
+                console.log(res);
+            }
+        })
+    });
+</script>
+
+<script>
+    /* 跳转到书籍详情页 */
+    function toBookDetail(id) {
+        sessionStorage.setItem("showBookDetailId",id);
+        // 获取当前的 url
+        $("#main").load("/toShowBooksDetail");
+    }
+</script>
+
+</body>
+</html>

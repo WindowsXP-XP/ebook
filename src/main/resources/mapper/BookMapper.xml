@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.xp.mapper.BookMapper">
+
+    <!-- BookDTO 结果集映射 -->
+    <resultMap id="dtoResultMap" type="com.xp.model.dto.BookDTO">
+        <id column="book_id"/>
+        <result property="categoryName" column="category_name"/>
+        <association property="book" javaType="com.xp.model.entity.Book" resultMap="BaseResultMap"/>
+    </resultMap>
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.xp.model.entity.Book">
+        <id column="book_id" property="bookId" />
+        <result column="book_name" property="bookName" />
+        <result column="book_author" property="bookAuthor" />
+        <result column="book_introduction" property="bookIntroduction" />
+        <result column="book_collection_time" property="bookCollectionTime" />
+        <result column="book_image" property="bookImage" />
+        <result column="book_total_word" property="bookTotalWord" />
+        <result column="book_is_deleted" property="bookIsDeleted" />
+        <result column="book_create_time" property="createTime" />
+        <result column="book_modified_time" property="modifiedTime" />
+        <result column="book_read_time" property="bookReadTime" />
+        <result column="book_author_id" property="bookAuthorId" />
+        <result column="book_category_id" property="bookCategoryId" />
+    </resultMap>
+
+    <sql id="dtoQuery">
+        select *
+        from ebook_book inner join ebook_book_category using (book_category_id)
+    </sql>
+
+    <!-- 查询所有书本信息，并封装进 DTO 对象中 -->
+    <select id="queryAllBook" resultMap="dtoResultMap">
+        <include refid="dtoQuery"/>
+        <if test="ew != null">
+            ${ew.customSqlSegment}
+        </if>
+    </select>
+
+    <!-- 根据id查询书籍详细 -->
+    <select id="queryBookDetailById" resultMap="dtoResultMap">
+        <include refid="dtoQuery"/>
+        where book_id = #{id}
+    </select>
+
+</mapper>

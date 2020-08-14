@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.xp.mapper.UserMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.xp.model.entity.User">
+        <id column="user_id" property="userId" />
+        <result column="user_name" property="userName" />
+        <result column="account" property="account" />
+        <result column="password" property="password" />
+        <result column="age" property="age" />
+        <result column="sex" property="sex" />
+        <result column="address" property="address" />
+        <result column="email" property="email" />
+        <result column="tel" property="tel" />
+        <result column="user_introduction" property="userIntroduction" />
+        <result column="user_is_deleted" property="userIsDeleted" />
+        <result column="user_create_time" property="createTime" />
+        <result column="user_modified_time" property="modifiedTime" />
+        <result column="avatar" property="avatar" />
+        <result column="salt" property="salt" />
+        <result column="last_login_time" property="lastLoginTime" />
+    </resultMap>
+
+    <sql id="dtoQuery">
+        select * from ebook_user inner join ebook_user_role  using(user_id) inner join ebook_role  using(role_id)
+                                   inner join ebook_role_permission  using(role_id) inner join ebook_permission  using(permission_id)
+    </sql>
+
+    <!-- UserDTO 映射结果集 -->
+    <resultMap id="UserDTOResultMap" type="com.xp.model.dto.UserDTO">
+        <id column="user_id"/>
+        <association property="user" resultMap="BaseResultMap"/>
+        <collection property="role" resultMap="com.xp.mapper.RoleMapper.BaseResultMap" ofType="com.xp.model.entity.Role"/>
+        <collection property="permission" resultMap="com.xp.mapper.PermissionMapper.BaseResultMap" ofType="com.xp.model.entity.Permission"/>
+    </resultMap>
+
+    <!-- 根据用户账号查询用户所有信息 -->
+    <select id="queryUserByUserAccount" resultMap="UserDTOResultMap">
+        <include refid="dtoQuery"/>
+        where account = #{account} and user_is_deleted = 0 and role_is_deleted = 0 and permission_is_deleted = 0
+    </select>
+
+    <select id="queryAllUser" resultMap="UserDTOResultMap">
+        <include refid="dtoQuery"/>
+        <if test="ew != null">
+            ${ew.customSqlSegment}
+        </if>
+    </select>
+
+</mapper>

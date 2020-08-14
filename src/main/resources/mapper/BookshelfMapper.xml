@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.xp.mapper.BookshelfMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.xp.model.entity.Bookshelf">
+        <id column="bs_id" property="bsId" />
+        <result column="bs_name" property="bsName" />
+        <result column="bs_user_id" property="bsUserId" />
+        <result column="bs_book_id" property="bsBookId" />
+        <result column="bs_book_is_deleted" property="bsBookIsDeleted" />
+        <result column="bs_create_time" property="createTime" />
+        <result column="bs_modified_time" property="modifiedTime" />
+    </resultMap>
+
+    <!-- dto 映射 -->
+    <resultMap id="dtoResultMap" type="com.xp.model.dto.BookShelfDTO">
+        <id column="bs_id" property="bsId" />
+        <result column="bs_name" property="bsName" />
+        <result column="bs_book_is_deleted" property="bsBookIsDeleted" />
+        <result column="bs_create_time" property="createTime" />
+        <result column="bs_modified_time" property="modifiedTime" />
+        <association property="book" resultMap="com.xp.mapper.BookMapper.BaseResultMap"/>
+        <association property="user" resultMap="com.xp.mapper.UserMapper.BaseResultMap"/>
+    </resultMap>
+
+    <select id="test" resultMap="dtoResultMap">
+        select * from ebook_bookshelf bs inner join ebook_user eu on bs.bs_user_id = eu.user_id inner join ebook_user u on bs.bs_user_id = u.user_id
+    </select>
+
+</mapper>

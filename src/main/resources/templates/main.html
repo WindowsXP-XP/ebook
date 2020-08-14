@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>书籍展示页面</title>
+</head>
+<body>
+
+<div class="category-con">
+    <div class="category-inner-con w1200">
+        <div class="category-type">
+            <h3>作品分类</h3>
+        </div>
+        <div class="category-tab-content">
+            <div class="nav-con">
+                <!-- 左边侧边栏书籍种类 -->
+                <ul class="normal-nav layui-clear" id="bookCategory">
+
+                </ul>
+            </div>
+        </div>
+    </div>
+    <div class="category-banner">
+        <div class="w1200">
+            <img th:src="@{/images/banner/Carousel_2.jpg}">
+        </div>
+    </div>
+</div>
+
+<div class="floors">
+    <div class="sk">
+        <div class="sk_inner w1200">
+            <div class="sk_hd">
+                <a href="javascript:;">
+                    <img th:src="@{/images/s_img1.jpg}">
+                </a>
+            </div>
+            <div class="sk_bd">
+                <div class="layui-carousel" id="test1">
+                    <!-- 推荐书目 -->
+                    <div carousel-item>
+                        <div class="item-box" id="recommendBooks">
+
+                        </div>
+                        <div class="item-box" id="recommendBooksCarousel">
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<div class="hot-recommend-con">
+    <div class="hot-con1 w1200 layui-clear">
+        <!-- 本周推荐 -->
+        <div class="week-recommend" id="weekRecommend">
+            <h4>本周推荐</h4>
+
+        </div>
+
+        <!-- 最近新书 -->
+        <div class="item week-recommend" id="newBook" style="width: 988px;height:600px;padding-right:0;padding-top:0;padding-left:50px;margin-right:0">
+            <h4 style="padding-right: 120px">新书推荐</h4>
+
+        </div>
+    </div>
+</div>
+
+
+<div class="product-list-box" id="product-list-box">
+    <div class="product-list-cont w1200">
+        <h4>更多推荐</h4>
+        <!-- 更多推荐 -->
+        <div class="product-item-box layui-clear" id="moreBook">
+
+        </div>
+        <div style="text-align: center">
+            <a style="font-size: 18px;margin-top: 50px" href="javascript: void(0) " onclick="more()">查看更多</a>
+        </div>
+    </div>
+</div>
+
+<script type="text/javascript">
+
+    layui.config({
+        base: 'js/' //你存放新模块的目录，注意，不是layui的模块目录
+    }).use(['mm','carousel'],function(){
+        var carousel = layui.carousel,
+            mm = layui.mm;
+        var option = {
+            elem: '#test1'
+            ,width: '100%' //设置容器宽度
+            ,arrow: 'always'
+            ,height:'298'
+            ,indicator:'none'
+        }
+        carousel.render(option);
+    });
+</script>
+
+<script>
+    /* 查看更多 */
+    function more() {
+        $('#main').load('/toShowBooks')
+    }
+    /* 跳转到书籍详情页 */
+    function toBookDetail(id) {
+        sessionStorage.setItem("showBookDetailId",id);
+        // 获取当前的 url
+        $("#main").load("/toShowBooksDetail");
+    }
+</script>
+
+<script>
+    /* 页面初始化 ajax */
+    /* 电子书类型 */
+    $.ajax({
+        url: "/bookCategory/getBookCategory",
+        type: "get",
+        dataType: "json",
+        success: function (data) {
+            // alert(data[0].categoryName)
+            var bookCategory = $("#bookCategory");
+            bookCategory.empty();
+            for (var i=0;i<data.length;i++){
+                var html = "<li class='nav-item'>\
+                      <div class='title'>"+data[i].categoryName+"</div>\
+                       <i class='layui-icon layui-icon-right'></i>\
+                    </li>";
+                bookCategory.append(html);
+            }
+        }
+    });
+    /* 获取推荐书籍内容 */
+    $.ajax({
+        url: "book/initIndexBook",
+        type: "get",
+        dataType: "json",
+        success: function (data) {
+            var allBooks = data.allBooks;
+            var newBooks = data.newBooks;
+            var weekRecommendBooks = data.weekRecommendBooks;
+            var recommendBooks = data.recommendBooks;
+            // alert(data.recommendBooks[0].bookName);
+            /* 热销书 */
+            for (var i=0;i<recommendBooks.length;i++){
+                // var contentStr = content.toString().substring(0,len)+"......";//拼接字符串
+                var html = "<div class='item' onclick='toBookDetail("+recommendBooks[i].bookId+")'>\
+                      <a href='javascript:;'><img class='bookImg' style='width: 150px;height: 200px;' src='"+recommendBooks[i].bookImage+"' alt='图片飞了'></a>\
+                      <div class='price'>\
+                        <span>"+recommendBooks[i].bookName+"</span>\
+                      </div>\
+                      <div class='title'>"+recommendBooks[i].bookAuthor+"</div>\
+                      </div>";
+                /* 放进轮播图 */
+                // alert(html);
+                if (i < recommendBooks.length/2){
+                    $("#recommendBooks").append(html);
+                } else {
+                    $("#recommendBooksCarousel").append(html);
+                }
+            }
+            /* 本周推荐 */
+            for (i=0;i<weekRecommendBooks.length;i++){
+                html = "<div class='week-recommend' onclick='toBookDetail("+weekRecommendBooks[i].bookId+")'>\
+                        <a href='javascript:;'><img src='"+weekRecommendBooks[i].bookImage+"' class='bookImg'></a>\
+                        <div><span>"+weekRecommendBooks[i].bookName+"</span></div>\
+                        <p style='text-align: center'>"+weekRecommendBooks[i].bookAuthor+"</p>\
+                      </div>";
+                $("#weekRecommend").append(html);
+            }
+            /* 更多推荐的书 */
+            for (i=0;i<allBooks.length;i++){
+                html = "<div class='list-item' onclick='toBookDetail("+allBooks[i].bookId+")'>\
+                    <a href='javascript:;'><img class='bookImg' style='padding:25px 0 15px 0' src='"+allBooks[i].bookImage+"'></a>\
+                    <div><span>"+allBooks[i].bookName+"</span></div>\
+                    <p style='text-align: center'>"+allBooks[i].bookAuthor+"</p>\
+                  </div>";
+                $("#moreBook").append(html);
+            }
+            /* 新书推荐 */
+            for (i=0;i<newBooks.length;i++){
+                html = "<div class='week-recommend' style='margin: 0;width: 170px;' onclick='toBookDetail("+newBooks[i].bookId+")'>\
+                     <a href='javascript:;'><img src='"+newBooks[i].bookImage+"' class='bookImg'></a>\
+                     <div><span>"+newBooks[i].bookName+"</span></div>\
+                     <p style='text-align: center'>"+newBooks[i].bookAuthor+"</p>\
+                  </div>";
+                $("#newBook").append(html)
+            }
+        }
+    });
+</script>
+</body>
+</html>

@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.xp.mapper.PermissionMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.xp.model.entity.Permission">
+        <id column="permission_id" property="permissionId" />
+        <result column="permission_code" property="permissionCode" />
+        <result column="permission_description" property="permissionDescription" />
+        <result column="permission_is_deleted" property="permissionIsDeleted" />
+        <result column="permission_name" property="permissionName" />
+        <result column="permission_create_time" property="createTime" />
+        <result column="permission_modified_time" property="modifiedTime" />
+    </resultMap>
+
+</mapper>

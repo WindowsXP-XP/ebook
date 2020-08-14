@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Document</title>
+    <link rel="stylesheet" type="text/css" th:href="@{/css/main.css}">
+    <link rel="stylesheet" type="text/css" th:href="@{/css/layui.css}">
+    <script type="text/javascript" th:src="@{/layui.js}"></script>
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=0">
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge,chrome=1">
+    <style>
+        .borderSpan{font-weight: bolder;font-size: 22px;margin-right: 10px}
+        .btnStyle{color: #d842c6;margin-top: 10px;margin-right: 10px}
+    </style>
+</head>
+<body>
+<div class="content content-nav-base information-content">
+    <div class="info-list-box">
+        <div class="info-list w1200">
+            <div class="item-box layui-clear" id="book_show">
+                <!-- ajax 填充内容 -->
+
+            </div>
+            <div id="comment_show">
+                <!-- 模板引擎填充内容 -->
+
+            </div>
+            <div id="demo0" style="text-align: center;"></div>
+        </div>
+    </div>
+</div>
+<!-- 模版引擎导入 -->
+<script type="text/html" id="comment">
+    {{# layui.each(d.data,function(index,item){}}
+    <div class="item" style="width: 100%">
+        <div class="img">
+            <img src={{"/"+item.bookImage}} alt="" style="width: 180px;height: 240px">
+        </div>
+        <div class="text">
+            <a style="font-size: 30px;color: #a96fa7;margin-top: 5px" th:href="@{/book/showDetails/{{item.bookId}}}">{{item.bookName}}</a>
+            <p class="data" style="font-size: 25px;color: #a96fa7;margin-bottom: 10px;">{{item.bookAuthor}}</p>
+            <span style="font-size: 18px;color: #a96fa7;">简介：</span><p class="info-cont" style="font-size: 18px;width: 800px;">{{item.bookIntroduction}}</p>
+            <div style="margin:10px 0">
+                <span style="color: #e36d1b" class="spanBorder">{{item.bookCategory}}</span>&nbsp;<span style="color: #52c1e2" class="spanBorder">字数：{{item.bookTotalWord}}</span>&nbsp;
+                <span style="color: #5adb98" class="spanBorder">阅读量：{{item.bookReadTime}}</span>&nbsp;<span style="color: #d862d4" class="spanBorder">收藏量：{{item.bookCollectionTime}}</span>
+            </div>
+        </div>
+    </div>
+    {{# })}}
+</script>
+
+<script>
+    layui.config({
+        base: 'js/' //你存放新模块的目录，注意，不是layui的模块目录
+    }).use(['mm','laypage','form'], function () {
+        var
+            mm = layui.mm,laypage = layui.laypage,form = layui.form;
+        // 模版引擎导入
+        var listCont = document.getElementById('comment_show');
+        var demoHtml = comment.innerHTML;
+        // 获取 session 中需要查看的书籍id
+        var id = sessionStorage.getItem("showBookDetailId");
+        /* 获取书籍信息 */
+        mm.request({
+            url: '/book/showDetails/'+id,
+            success: function (res) {
+                var item = res.bookDetail;
+                var html =
+                    "<div class='item' style='width: 100%'>\
+                        <div class='img'>\
+                            <img src='/"+item.book.bookImage+"' alt='' style='width: 180px;height: 240px'>\
+                        </div>\
+                        <div class='text'>\
+                            <a style='font-size: 30px;color: #a96fa7;margin-top: 5px' >"+item.book.bookName+"</a>\
+                            <p class='data' style='font-size: 25px;color: #a96fa7;margin-bottom: 10px;'>"+item.book.bookAuthor+"</p>\
+                            <p style='font-size: 20px;margin-bottom: 5px'>字数：<span class='borderSpan'>"+item.book.bookTotalWord+"万</span>阅读量：<span class='borderSpan'>"+item.book.bookReadTime+"</span></p>\
+                            <span style='font-size: 18px;color: #a96fa7;'>简介：</span><p class='info-cont' style='font-size: 18px;width: 800px;'>"+item.book.bookIntroduction+"</p>\
+                        </div>\
+                        <div><button class='layui-btn layui-btn-lg layui-btn-primary btnStyle'>开始阅读</button>\
+                        <button class='layui-btn layui-btn-lg btnStyle layui-btn-primary'>加入收藏</button></div>\
+                    </div>";
+                $("#book_show").append(html);
+                $(".btnStyle").hover(function () {
+                    $(this).css('background-color',"#d842c6")
+                },function () {
+                    $(this).css('background-color',"white")
+                })
+            },
+            error: function (res) {
+                console.log(res);
+                layer.msg("请求失败")
+            }
+        });
+        /* 获取评论信息 */
+        mm.request({
+            url: '/comment/showComment/'+id,
+            success: function (res) {
+                console.log(res);
+                var html=
+                    "<h2>评论专区</h2><br/>\
+                    <form class='layui-form' id='commentForm'>\
+                        <div class='layui-form-item layui-form-text'>\
+                            <label class='layui-form-label'>评论内容</label>\
+                             <div class='layui-input-block'>\
+                                <textarea id='vod_content' name='comment' type='text/plain' style='width:99%;height:250px;font-size: 20px'></textarea>\
+                             </div>\
+                         </div>\
+                         <div class='layui-form-item'>\
+                            <div class='layui-input-block'>\
+                              <button class='layui-btn' lay-submit lay-filter='commentForm'>立即提交</button>\
+                              <button type='reset' class='layui-btn layui-btn-primary'>重置</button>\
+                            </div>\
+                          </div>\
+                     </form>\
+                    ";
+                listCont.innerHTML = mm.renderHtml(html, res);
+                laypage.render({
+                    elem: 'demo0'
+                    , count: res.count //数据总数
+                    // ,
+                });
+            }
+        });
+        /* 提交评论 */
+        //监听提交
+        form.on('submit(commentForm)', function(data){
+            var session = JSON.parse(sessionStorage.getItem("user"));
+            if (session == null || session.userId == null){
+                layer.msg("请先登录后再评论");
+                return false;
+            }
+            $.ajax({
+                url: '/comment/saveComment',
+                method: 'post',
+                data: '{"commentFromUserId":"'+session.userId+'","commentToUserId":"'+null+'","bookId":"'+id+'","commentContent":"'+data.field.comment+'"}',
+                dataType: 'json',
+                contentType: 'application/json;charset=UTF-8',
+                success: function (data) {
+                    if (data.status === 0){
+                        layer.msg("评论成功")
+                    }else {
+                        layer.msg("评论失败")
+                    }
+                },
+                error: function (error) {
+                    if (error.status === 1){
+                    }
+                }
+            });
+            return false;
+        });
+    });
+</script>
+
+<script>
+    /* 鼠标悬停事件 */
+    function mouseover(_this){
+        $(_this).css('background-color',"#d842c6")
+    }
+</script>
+
+</body>
+</html>

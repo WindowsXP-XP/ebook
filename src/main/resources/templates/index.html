@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <title>ebook网</title>
+  <link rel="stylesheet" type="text/css" th:href="@{/css/main.css}">
+  <link rel="stylesheet" type="text/css" th:href="@{/css/layui.css}">
+  <script type="text/javascript" th:src="@{/layui.js}"></script>
+  <script type="text/javascript" th:src="@{/js/jquery.min.js}"></script>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=0">
+  <meta http-equiv="X-UA-Compatible" content="IE=Edge,chrome=1">
+  <style type="text/css">
+    .bookImg{width: 150px;height: 200px}
+  </style>
+</head>
+<body id="list-cont">
+  <div class="site-nav-bg">
+    <div class="site-nav w1200">
+      <p class="sn-back-home">
+        <i class="layui-icon layui-icon-home"></i>
+        <a href="#">首页</a>
+      </p>
+      <div class="sn-quick-menu">
+        <div class="login"><a onclick="toLogin()">登录</a></div>
+        <div class="sp-cart"><a href="shopcart.html">购物车</a><span>2</span></div>
+      </div>
+    </div>
+  </div>
+
+
+  <div class="header">
+    <div class="headerLayout w1200">
+      <div class="headerCon">
+        <h1 class="mallLogo">
+          <a href="#" title="eBook">
+            <img th:src="@{/images/logo.png}">
+          </a>
+        </h1>
+        <div class="mallSearch">
+          <form action="" class="layui-form" novalidate>
+            <input type="text" name="title" required  lay-verify="required" autocomplete="off" class="layui-input" placeholder="请输入需要的商品">
+            <button class="layui-btn" lay-submit lay-filter="formDemo">
+                <i class="layui-icon layui-icon-search"></i>
+            </button>
+            <input type="hidden" name="" value="">
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 导航栏 -->
+  <div class="content">
+    <div class="main-nav">
+      <div class="inner-cont0">
+        <div class="inner-cont1 w1200">
+          <div class="inner-cont2">
+            <a  class="active" id="toMain">首页</a>
+            <a  id="toShowBooks">书库</a>
+            <a href="information.html">排行</a>
+            <a href="about.html">书架</a>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 加载内容 -->
+    <div id="main" style="height: 100%">
+
+    </div>
+
+  </div>
+
+  <div class="footer">
+    <div class="ng-promise-box">
+      <div class="ng-promise w1200">
+        <p class="text">
+          <a class="icon1" href="javascript:;">7天无理由退换货</a>
+          <a class="icon2" href="javascript:;">满99元全场免邮</a>
+          <a class="icon3" style="margin-right: 0" href="javascript:;">100%品质保证</a>
+        </p>
+      </div>
+    </div>
+    <div class="mod_help w1200">                                     
+      <p>
+        <a href="javascript:;">关于我们</a>
+        <span>|</span>
+        <a href="javascript:;">帮助中心</a>
+        <span>|</span>
+        <a href="javascript:;">售后服务</a>
+        <span>|</span>
+        <a href="javascript:;">母婴资讯</a>
+        <span>|</span>
+        <a href="javascript:;">关于货源</a>
+      </p>
+      <p class="coty">母婴商城版权所有 &copy; 2012-2020</p>
+    </div>
+  </div>
+  <script type="text/javascript">
+
+layui.config({
+    base: 'js/' //你存放新模块的目录，注意，不是layui的模块目录
+  }).use(['mm','carousel'],function(){
+      var carousel = layui.carousel,
+     mm = layui.mm;
+     var option = {
+        elem: '#test1'
+        ,width: '100%' //设置容器宽度
+        ,arrow: 'always'
+        ,height:'298'
+        ,indicator:'none'
+      }
+      carousel.render(option);
+      // 模版引擎导入
+     // var ins = carousel.render(option);
+     // var html = demo.innerHTML;
+     // var listCont = document.getElementById('list-cont');
+     // // console.log(layui.router("#/about.html"))
+     //  mm.request({
+     //    url: '../json/index.json',
+     //    success : function(res){
+     //      console.log(res)
+     //      listCont.innerHTML = mm.renderHtml(html,res)
+     //      ins.reload(option);
+     //    },
+     //    error: function(res){
+     //      console.log(res);
+     //    }
+     //  })
+});
+  </script>
+
+  <script th:inline="javascript">
+    $(function () {
+      /* 初始化页面 */
+      $("#main").load("/toMain");
+      /* 将登录后的session信息存储到 sessionStorage 中 */
+      sessionStorage.setItem("user",JSON.stringify(/*[[${session.user}]]*/null));
+      /* 点击后主div展示不同的内容 */
+      $(".inner-cont2").children().click(function () {
+        $("#main").load('/'+$(this).attr('id'));
+      });
+    });
+    /* 点击登录按钮 */
+    function toLogin() {
+      $("#main").load("/user/toLogin");
+    }
+  </script>
+
+<!--  <script>-->
+<!--    /* 页面初始化 ajax */-->
+<!--    /* 电子书类型 */-->
+<!--    $.ajax({-->
+<!--      url: "/bookCategory/getBookCategory",-->
+<!--      type: "get",-->
+<!--      dataType: "json",-->
+<!--      success: function (data) {-->
+<!--        // alert(data[0].categoryName)-->
+<!--        for (var i=0;i<data.length;i++){-->
+<!--          var html = "<li class='nav-item'>\-->
+<!--                      <div class='title'>"+data[i].categoryName+"</div>\-->
+<!--                       <i class='layui-icon layui-icon-right'></i>\-->
+<!--                    </li>";-->
+<!--          $("#bookCategory").append(html);-->
+<!--        }-->
+<!--      }-->
+<!--    });-->
+
+<!--  </script>-->
+</body>
+</html>
